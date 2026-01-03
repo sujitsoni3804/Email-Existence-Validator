@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Validator</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236366f1'><path d='M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z'/></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            50: "#f8fafc", 100: "#f1f5f9", 200: "#e2e8f0", 300: "#cbd5e1", 400: "#94a3b8", 500: "#64748b", 600: "#475569", 700: "#334155", 800: "#1e293b", 900: "#0f172a", 950: "#020617",
+                        },
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2); }
+        .glass-effect { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(100, 116, 139, 0.2); }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    <header class="border-b border-dark-700 glass-effect">
+        <div class="container mx-auto px-6 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 p-2 rounded-xl">
+                        <i class="fas fa-envelope-open-text text-white text-xl"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Email Validator</h1>
+                </div>
+                <div class="flex items-center">
+                    <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full border border-green-500/30">
+                        <i class="fas fa-circle text-green-400 text-xs mr-1"></i>Active
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="container mx-auto px-6 py-8">
+        <div class="flex justify-center mb-8">
+            <div class="glass-effect rounded-xl p-2 inline-flex">
+                <button id="singleModeBtn" class="w-48 py-4 rounded-lg font-medium transition-all duration-200 bg-indigo-600 text-white shadow-lg flex items-center justify-center">
+                    <i class="fas fa-envelope mr-2"></i>Single Email
+                </button>
+                <button id="bulkModeBtn" class="w-48 py-4 rounded-lg font-medium transition-all duration-200 text-gray-400 hover:text-white flex items-center justify-center">
+                    <i class="fas fa-list mr-2"></i>Bulk Validation
+                </button>
+            </div>
+        </div>
+        <div id="singleEmailSection" class="max-w-4xl mx-auto">
+            <div class="glass-effect rounded-2xl shadow-2xl card-hover">
+                <div class="p-10">
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-search text-2xl text-white"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-2">Validate Email Address</h2>
+                        <p class="text-gray-400">Enter an email address to check its deliverability</p>
+                    </div>
+                    <form id="singleEmailForm" class="space-y-6">
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                            <div class="relative">
+                                <input type="email" id="email" name="email" placeholder="example@domain.com" class="w-full px-4 py-4 pl-12 bg-dark-800 border border-dark-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 text-white placeholder-gray-500" required>
+                                <i class="fas fa-envelope absolute left-5 top-5 text-gray-500"></i>
+                            </div>
+                        </div>
+                        <button type="submit" id="validateBtn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-indigo-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 flex items-center justify-center shadow-lg">
+                            <i class="fas fa-search mr-2"></i>Validate Email
+                        </button>
+                    </form>
+                    <div id="singleResult" class="mt-6 hidden"></div>
+                </div>
+            </div>
+        </div>
+        <div id="bulkEmailSection" class="max-w-4xl mx-auto hidden">
+            <div class="glass-effect rounded-2xl shadow-2xl card-hover">
+                <div class="p-10">
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-list text-2xl text-white"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-2">Bulk Email Validation</h2>
+                        <p class="text-gray-400">Upload a CSV or Excel file to validate multiple emails</p>
+                    </div>
+                    <div class="mb-6 bg-blue-500/10 border border-blue-500/30 rounded-xl p-5">
+                        <div class="flex items-start">
+                            <i class="fas fa-info-circle text-blue-400 text-xl mr-3 mt-1"></i>
+                            <div>
+                                <h3 class="font-semibold text-blue-400 mb-2">How to prepare your CSV file:</h3>
+                                <ul class="text-gray-300 text-sm space-y-2">
+                                    <li class="flex items-start"><i class="fas fa-check text-green-400 mr-2 mt-1 text-xs"></i><span>Simply list your email addresses, <strong>one per line</strong></span></li>
+                                    <li class="flex items-start"><i class="fas fa-check text-green-400 mr-2 mt-1 text-xs"></i><span><strong>No column headers</strong> needed</span></li>
+                                    <li class="flex items-start"><i class="fas fa-check text-green-400 mr-2 mt-1 text-xs"></i><span><strong>No numbering</strong> required</span></li>
+                                </ul>
+                                <div class="mt-4 bg-dark-800/50 rounded-lg p-3 border border-dark-600">
+                                    <p class="text-xs text-gray-400 mb-2"><i class="fas fa-lightbulb text-yellow-400 mr-1"></i> Example format:</p>
+                                    <code class="text-green-400 text-sm block leading-relaxed">john@example.com<br>sarah@company.org<br>mike@business.net</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <form id="bulkEmailForm" class="space-y-6">
+                        <div>
+                            <label for="file" class="block text-sm font-medium text-gray-300 mb-2">Upload File</label>
+                            <div class="relative border-2 border-dashed border-dark-600 rounded-xl p-8 text-center hover:border-purple-500 transition-colors duration-200 bg-dark-800/50">
+                                <input type="file" id="file" name="file" accept=".csv,.xlsx,.xls" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" required>
+                                <div class="space-y-3">
+                                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-500"></i>
+                                    <div>
+                                        <p class="text-gray-300"><span class="font-semibold text-purple-400">Click to upload</span> or drag and drop</p>
+                                        <p class="text-xs text-gray-500 mt-1">CSV, XLSX, XLS files (max 16MB)</p>
+                                    </div>
+                                </div>
+                                <div id="fileName" class="hidden mt-3 text-lg text-blue-400 font-bold"></div>
+                            </div>
+                        </div>
+                        <button type="submit" id="bulkValidateBtn" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transform hover:scale-105 transition-all duration-200 flex items-center justify-center shadow-lg">
+                            <i class="fas fa-tasks mr-2"></i>Validate Bulk Emails
+                        </button>
+                    </form>
+                    <div id="bulkResult" class="mt-6 hidden"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div id="loadingModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+        <div class="glass-effect rounded-2xl p-10 max-w-lg mx-4 shadow-2xl w-full">
+            <div class="text-center">
+                <div class="relative w-20 h-20 mx-auto mb-8">
+                    <div class="absolute inset-0 border-4 border-purple-200 rounded-full"></div>
+                    <div class="absolute inset-0 border-4 border-purple-600 rounded-full animate-spin border-t-transparent"></div>
+                </div>
+                <h3 class="text-2xl font-semibold mb-6 text-white">Processing Validation</h3>
+                <div id="progressInfo" class="text-gray-300 mb-8 text-lg">
+                    <p>Please wait while we validate your emails</p>
+                </div>
+                <div class="w-full bg-dark-700 rounded-full h-4 mb-6 overflow-hidden">
+                    <div id="progressBar" class="bg-gradient-to-r from-purple-500 to-pink-500 h-4 rounded-full transition-all duration-300 shadow-lg" style="width: 0%"></div>
+                </div>
+                <div id="progressText" class="text-lg text-gray-400 font-medium">0%</div>
+            </div>
+        </div>
+    </div>
+    <div id="downloadModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+        <div class="glass-effect rounded-2xl shadow-2xl max-w-md mx-4 p-8">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check text-3xl text-green-400"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-white mb-2">Download Complete</h3>
+                <p class="text-gray-400 mb-6">Your validation results have been downloaded successfully.</p>
+                <button onclick="closeDownloadModal()" class="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-8 py-3 rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-200 font-medium">Got it</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        let pollInterval;
+        const singleModeBtn = document.getElementById("singleModeBtn");
+        const bulkModeBtn = document.getElementById("bulkModeBtn");
+        const singleEmailSection = document.getElementById("singleEmailSection");
+        const bulkEmailSection = document.getElementById("bulkEmailSection");
+        singleModeBtn.addEventListener("click", () => {
+            singleModeBtn.classList.add("bg-indigo-600", "text-white", "shadow-lg");
+            singleModeBtn.classList.remove("text-gray-400", "hover:text-white");
+            bulkModeBtn.classList.remove("bg-purple-600", "text-white", "shadow-lg");
+            bulkModeBtn.classList.add("text-gray-400", "hover:text-white");
+            singleEmailSection.classList.remove("hidden");
+            bulkEmailSection.classList.add("hidden");
+        });
+        bulkModeBtn.addEventListener("click", () => {
+            bulkModeBtn.classList.add("bg-purple-600", "text-white", "shadow-lg");
+            bulkModeBtn.classList.remove("text-gray-400", "hover:text-white");
+            singleModeBtn.classList.remove("bg-indigo-600", "text-white", "shadow-lg");
+            singleModeBtn.classList.add("text-gray-400", "hover:text-white");
+            bulkEmailSection.classList.remove("hidden");
+            singleEmailSection.classList.add("hidden");
+        });
+        function resetProgress() {
+            document.getElementById("progressInfo").innerHTML = "<p>Please wait while we validate your emails</p>";
+            document.getElementById("progressBar").style.width = "0%";
+            document.getElementById("progressText").textContent = "0%";
+        }
+        document.getElementById("file").addEventListener("change", function(e) {
+            const fileName = document.getElementById("fileName");
+            if (e.target.files.length > 0) {
+                fileName.innerHTML = `<i class="fas fa-file-alt mr-2"></i>Selected: ${e.target.files[0].name}`;
+                fileName.classList.remove("hidden");
+            } else {
+                fileName.classList.add("hidden");
+            }
+        });
+        document.getElementById("singleEmailForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const email = document.getElementById("email").value;
+            const btn = document.getElementById("validateBtn");
+            const result = document.getElementById("singleResult");
+            btn.innerHTML = '<div class="flex items-center justify-center"><div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>Validating...</div>';
+            btn.disabled = true;
+            try {
+                const response = await fetch("/validate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
+                const data = await response.json();
+                if (data.error) {
+                    showResult(result, "error", data.error);
+                } else {
+                    const statusColor = getStatusColor(data.smtp_check);
+                    const statusIcon = getStatusIcon(data.smtp_check);
+                    result.innerHTML = `<div class="bg-dark-800/50 border border-dark-600 rounded-xl p-6 mt-6">
+                        <div class="flex items-center justify-between mb-4"><h4 class="font-semibold text-white text-lg">Validation Result</h4></div>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-3 bg-dark-700/50 rounded-lg"><span class="text-gray-400">Email Address:</span><span class="font-medium text-white">${data.email}</span></div>
+                            <div class="flex items-center justify-between p-3 bg-dark-700/50 rounded-lg"><span class="text-gray-400">Status:</span><span class="flex items-center ${statusColor} font-semibold"><i class="${statusIcon} mr-2"></i>${data.smtp_check}</span></div>
+                        </div>
+                    </div>`;
+                    result.classList.remove("hidden");
+                }
+            } catch (error) {
+                showResult(result, "error", "Network error occurred");
+            }
+            btn.innerHTML = '<i class="fas fa-search mr-2"></i>Validate Email';
+            btn.disabled = false;
+        });
+        document.getElementById("bulkEmailForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById("file");
+            const btn = document.getElementById("bulkValidateBtn");
+            const result = document.getElementById("bulkResult");
+            const modal = document.getElementById("loadingModal");
+            if (!fileInput.files[0]) {
+                showResult(result, "error", "Please select a file");
+                return;
+            }
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+            modal.classList.remove("hidden");
+            resetProgress();
+            btn.disabled = true;
+            try {
+                const response = await fetch("/bulk-validate", { method: "POST", body: formData });
+                const data = await response.json();
+                if (data.error) {
+                    showResult(result, "error", data.error);
+                    modal.classList.add("hidden");
+                    btn.disabled = false;
+                } else {
+                    const taskId = data.task_id;
+                    pollInterval = setInterval(() => pollProgress(taskId, modal, result, btn), 1000);
+                }
+            } catch (error) {
+                showResult(result, "error", "Network error occurred");
+                modal.classList.add("hidden");
+                btn.disabled = false;
+            }
+        });
+        function pollProgress(taskId, modal, result, btn) {
+            fetch(`/progress/${taskId}`).then(response => response.json()).then(data => {
+                if (data.status === 'running') {
+                    document.getElementById("progressInfo").innerHTML = `<p class="font-medium text-white">Validating ${data.current} of ${data.total} emails</p><p class="text-sm text-gray-400 mt-1 truncate">${data.email}</p>`;
+                    document.getElementById("progressBar").style.width = data.progress + "%";
+                    document.getElementById("progressText").textContent = data.progress + "%";
+                } else if (data.status === 'completed') {
+                    clearInterval(pollInterval);
+                    modal.classList.add("hidden");
+                    result.innerHTML = `<div class="bg-green-500/10 border border-green-500/30 rounded-xl p-6 mt-6">
+                        <div class="flex items-center mb-4"><i class="fas fa-check-circle text-green-400 mr-3 text-xl"></i><h4 class="font-semibold text-green-400 text-lg">Validation Complete!</h4></div>
+                        <p class="text-gray-300 mb-6">Bulk validation completed successfully!</p>
+                        <button onclick="downloadAndReset('${data.download_url}')" class="inline-flex items-center bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-200 font-medium shadow-lg"><i class="fas fa-download mr-2"></i>Download Results</button>
+                    </div>`;
+                    result.classList.remove("hidden");
+                    btn.disabled = false;
+                } else if (data.status === 'error') {
+                    clearInterval(pollInterval);
+                    showResult(result, "error", data.message);
+                    modal.classList.add("hidden");
+                    btn.disabled = false;
+                }
+            }).catch(() => {
+                clearInterval(pollInterval);
+                showResult(result, "error", "Progress check failed");
+                modal.classList.add("hidden");
+                btn.disabled = false;
+            });
+        }
+        function showResult(element, type, message) {
+            const bgColor = type === "error" ? "bg-red-500/10 border-red-500/30" : "bg-green-500/10 border-green-500/30";
+            const textColor = type === "error" ? "text-red-400" : "text-green-400";
+            const icon = type === "error" ? "fa-exclamation-circle text-red-400" : "fa-check-circle text-green-400";
+            element.innerHTML = `<div class="${bgColor} border rounded-xl p-6 mt-6"><div class="flex items-center"><i class="fas ${icon} mr-3 text-xl"></i><span class="${textColor} font-medium">${message}</span></div></div>`;
+            element.classList.remove("hidden");
+        }
+        function getStatusColor(status) {
+            switch (status) {
+                case "Valid": return "text-green-400";
+                case "Invalid": case "Invalid Email Format": return "text-red-400";
+                case "Unknown": return "text-yellow-400";
+                case "Error": return "text-red-400";
+                case "Empty": return "text-gray-400";
+                default: return "text-gray-400";
+            }
+        }
+        function getStatusIcon(status) {
+            switch (status) {
+                case "Valid": return "fas fa-check-circle";
+                case "Invalid": case "Invalid Email Format": return "fas fa-times-circle";
+                case "Unknown": return "fas fa-question-circle";
+                case "Error": return "fas fa-times-circle";
+                case "Empty": return "fas fa-minus-circle";
+                default: return "fas fa-question-circle";
+            }
+        }
+        function downloadAndReset(downloadUrl) {
+            const link = document.createElement("a");
+            link.href = downloadUrl;
+            link.download = "";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => { resetBulkValidationForm(); }, 500);
+        }
+        function resetBulkValidationForm() {
+            document.getElementById("file").value = "";
+            document.getElementById("fileName").classList.add("hidden");
+            document.getElementById("bulkResult").classList.add("hidden");
+            document.getElementById("bulkValidateBtn").disabled = false;
+            showDownloadConfirmation();
+        }
+        function showDownloadConfirmation() { document.getElementById("downloadModal").classList.remove("hidden"); }
+        function closeDownloadModal() { document.getElementById("downloadModal").classList.add("hidden"); }
+    </script>
+</body>
+</html>
